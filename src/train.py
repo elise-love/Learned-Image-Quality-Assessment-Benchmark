@@ -126,6 +126,8 @@ def train(cfg: dict, seed: int, ckpt_root: str, force: bool = False) -> dict | N
     model = IQAModel(cfg["backbone"], pretrained=cfg.get("pretrained", True),
                      freeze_backbone=cfg.get("freeze_backbone", False),
                      dropout=cfg.get("dropout", 0.0)).to(device)
+    if cfg.get("init_bias_to_mean", True):
+        model.init_head_bias(float(train_dl.dataset.df["mos"].mean()))
     opt = torch.optim.AdamW(model.param_groups(cfg["lr_backbone"], cfg["lr_head"],
                                                cfg.get("weight_decay", 0.01)))
 

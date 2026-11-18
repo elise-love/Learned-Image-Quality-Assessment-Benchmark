@@ -25,6 +25,21 @@ KonIQ-10k official test split (2,015 images). SRCC is the primary metric. PLCC i
 
 *(Figure `results/figures/scatter_koniq.png`, predicted score vs. MOS, will be added here.)*
 
+### Resolution ablation (baselines)
+
+The same baselines on the same 2,015 test images at native 1024×768 resolution vs. the 512×384 input used in the main table.
+
+| Method | SRCC @ 512×384 | SRCC @ 1024×768 | Δ |
+|---|---|---|---|
+| NIQE | 0.379 | 0.529 | +0.150 |
+| BRISQUE | 0.231 | 0.222 | −0.009 |
+| NIMA (AVA) | 0.535 | 0.528 | −0.008 |
+| NIMA (KonIQ) | 0.880 | 0.879 | −0.002 |
+| CLIP-IQA | 0.642 | 0.684 | +0.042 |
+| MUSIQ (KonIQ) | 0.870 | 0.945 | +0.075 |
+
+Downsampling removes fine detail that NIQE and the multi-scale MUSIQ rely on, while NIMA is essentially unaffected. MUSIQ at native resolution exceeds its published KonIQ-10k result (0.916). Its released checkpoint may have been trained on a split that differs from the official one, so it is treated here as a reference rather than a strictly comparable competitor.
+
 ## Key findings
 
 To be written from measured results.
@@ -40,7 +55,7 @@ To be written from measured results.
 
 **Protocol.** All scores are normalized to [0, 1] with higher = better. Lower-is-better metrics (NIQE, BRISQUE) are sign-flipped before computing correlations. Checkpoints are selected on the validation split, and the test split is evaluated once. Augmentation is limited to horizontal flips (and random crops where used), because color, brightness or blur changes would alter perceived quality and invalidate the labels.
 
-**Models.** ImageNet-pretrained ResNet-50 and ViT-S/16 (timm), global pooling + `Linear(features, 1)`, L1 loss, AdamW (backbone lr 1e-5, head lr 1e-4), cosine schedule. KonIQ images are used at 512×384 without cropping.
+**Models.** ImageNet-pretrained ResNet-50 and ViT-S/16 (timm), global pooling + `Linear(features, 1)`, L1 loss, AdamW (backbone lr 1e-5, head lr 1e-3, head bias initialized to the mean training MOS), cosine schedule. KonIQ images are used at 512×384 without cropping.
 
 ## Reproduce
 

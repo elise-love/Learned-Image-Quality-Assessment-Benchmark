@@ -41,6 +41,11 @@ class IQAModel(nn.Module):
             for p in self.backbone.parameters():
                 p.requires_grad = False
 
+    def init_head_bias(self, value: float) -> None:
+        """Start the head at the mean training MOS, so early training learns
+        the ranking of images instead of spending steps on a global offset."""
+        nn.init.constant_(self.head[-1].bias, value)
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = (x - self.mean) / self.std          # inputs arrive in [0, 1]
         return self.head(self.backbone(x)).squeeze(1)

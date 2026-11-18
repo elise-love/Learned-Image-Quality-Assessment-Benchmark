@@ -38,6 +38,10 @@ SPECS = {
     "koniq10k": DatasetSpec("koniq10k", "koniq10k/512x384",
                             "meta_info/meta_info_KonIQ10kDataset.csv",
                             (1, 100), False, split_col="official_split"),
+    # Same images and split at native resolution (resolution ablation for baselines)
+    "koniq10k-1024": DatasetSpec("koniq10k-1024", "koniq10k/1024x768",
+                                 "meta_info/meta_info_KonIQ10kDataset.csv",
+                                 (1, 100), False, split_col="official_split"),
     "spaq": DatasetSpec("spaq", "SPAQ/resized512",
                         "meta_info/meta_info_SPAQDataset.csv", (1, 100), False),
     "livec": DatasetSpec("livec", "LIVEC",

@@ -10,16 +10,16 @@ In applied industry work on automatic photo quality scoring, we found that widel
 
 ## Main results
 
-KonIQ-10k official test split (2,015 images). SRCC is the primary metric. PLCC is computed after 4-parameter logistic fitting. Trained models: mean ± std over 3 seeds.
+KonIQ-10k official test split (2,015 images). SRCC is the primary metric. PLCC is computed after 4-parameter logistic fitting. Trained models: mean ± std over 3 seeds. All methods receive the same 512×384 input; baselines use pretrained weights from pyiqa without retraining.
 
 | Method | Type | Trained on | SRCC | PLCC |
 |---|---|---|---|---|
-| NIQE | classical | none (natural-scene statistics) | – | – |
-| BRISQUE | classical | LIVE (synthetic) | – | – |
-| NIMA | learned | AVA (aesthetics) | – | – |
-| NIMA | learned | KonIQ-10k | – | – |
-| CLIP-IQA | zero-shot | none | – | – |
-| MUSIQ | learned | KonIQ-10k | – | – |
+| NIQE | classical | none (natural-scene statistics) | 0.379 | 0.397 |
+| BRISQUE | classical | LIVE (synthetic) | 0.231 | 0.248 |
+| NIMA | learned | AVA (aesthetics) | 0.535 | 0.618 |
+| NIMA | learned | KonIQ-10k | 0.880 | 0.911 |
+| CLIP-IQA | zero-shot | none | 0.642 | 0.725 |
+| MUSIQ | learned | KonIQ-10k | 0.870 | 0.902 |
 | ResNet-50 (ours) | fine-tuned | KonIQ-10k | – | – |
 | ViT-S/16 (ours) | fine-tuned | KonIQ-10k | – | – |
 

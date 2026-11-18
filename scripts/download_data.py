@@ -19,7 +19,7 @@ def main():
 
     for name in args.datasets:
         download(name, args.data_root)
-        if name == "koniq10k":
+        if name.startswith("koniq10k"):
             for phase in ["train", "val", "test"]:
                 n = len(load_meta(name, args.data_root, phase))
                 print(f"KonIQ-10k {phase}: {n} images")

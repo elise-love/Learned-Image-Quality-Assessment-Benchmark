@@ -1,0 +1,13 @@
+# Resolution ablation: the same baselines on KonIQ-10k test images at native 1024x768.
+# Results are appended to the same summary.csv under dataset "koniq10k-1024".
+data_root: ./datasets
+out_dir: results/baselines
+datasets:
+  koniq10k-1024: {phase: test, batch_size: 4}
+metrics:
+  niqe:       {trained_on: "none (natural-scene statistics)"}
+  brisque:    {trained_on: "LIVE (synthetic distortions)"}
+  nima:       {trained_on: "AVA (aesthetics)"}
+  nima-koniq: {trained_on: "KonIQ-10k"}
+  musiq:      {trained_on: "KonIQ-10k"}
+  clipiqa:    {trained_on: "none (zero-shot CLIP prompts)"}

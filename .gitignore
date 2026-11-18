@@ -1,0 +1,28 @@
+# Datasets are never committed (see README for download instructions)
+datasets/
+data/
+*.tgz
+*.zip
+
+# Checkpoints and logs
+checkpoints/
+*.pth
+*.pt
+runs/
+wandb/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor / IDE files
+.vs/
+.vscode/
+.idea/

@@ -1,0 +1,25 @@
+# ResNet-50 fine-tuned on KonIQ-10k (main experiment)
+exp_name: resnet50
+backbone: resnet50
+pretrained: true
+freeze_backbone: false
+
+dataset: koniq10k
+data_root: ./datasets
+crop_size: null        # null = full 512x384 image (no crop); e.g. 384 for random crops
+resize: null
+
+batch_size: 16
+eval_batch_size: 32
+num_workers: 4
+epochs: 15
+warmup_epochs: 1
+lr_backbone: 1.0e-5
+lr_head: 1.0e-4
+weight_decay: 0.01
+loss: l1               # l1 | mse | l1+plcc | mse+plcc
+plcc_weight: 1.0
+amp: true
+
+out_dir: results/runs
+results_table: results/main_runs.csv

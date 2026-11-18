@@ -1,0 +1,13 @@
+# torch / torchvision come preinstalled on Colab and Kaggle; install separately elsewhere.
+torch>=2.1
+torchvision>=0.16
+timm>=0.9
+pyiqa>=0.1.13
+huggingface_hub>=0.20
+numpy
+scipy
+pandas
+pyyaml
+pillow
+tqdm
+matplotlib

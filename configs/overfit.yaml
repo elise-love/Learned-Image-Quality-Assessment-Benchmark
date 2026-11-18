@@ -1,0 +1,12 @@
+# Sanity check: fit 64 training images with no augmentation.
+# Expected: train loss falls toward 0 and "val" SRCC (same images) rises to ~0.99.
+# If it does not, something in data, labels, model or optimizer is broken.
+base: configs/resnet50.yaml
+exp_name: overfit_resnet50
+overfit: 64
+epochs: 30
+warmup_epochs: 0
+lr_backbone: 1.0e-4
+lr_head: 1.0e-3
+num_workers: 2
+out_dir: results/sanity

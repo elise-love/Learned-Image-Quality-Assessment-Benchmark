@@ -4,3 +4,14 @@
 13:11:54 | nima-koniq   SRCC 0.8637  PLCC 0.8714  (480s, lower_better=False)
 13:19:55 | musiq        SRCC 0.8686  PLCC 0.8760  (478s, lower_better=False)
 13:19:55 | livec: 1162 images
+15:44:36 | livec: 1162 images
+15:45:24 | niqe         SRCC 0.4493  PLCC 0.4933  (48s, lower_better=True)
+15:45:59 | brisque      SRCC 0.3129  PLCC 0.3607  (35s, lower_better=True)
+15:46:56 | nima-koniq   SRCC 0.7933  PLCC 0.8325  (57s, lower_better=False)
+15:47:38 | musiq        SRCC 0.7889  PLCC 0.8304  (42s, lower_better=False)
+15:47:39 | kadid10k: 10125 images
+15:50:41 | niqe         SRCC 0.3794  PLCC 0.4385  (182s, lower_better=True)
+15:51:40 | brisque      SRCC 0.3297  PLCC 0.3949  (59s, lower_better=True)
+15:53:53 | nima-koniq   SRCC 0.5573  PLCC 0.5787  (133s, lower_better=False)
+15:58:27 | musiq        SRCC 0.5555  PLCC 0.5965  (274s, lower_better=False)
+15:58:27 | Summary written to results/baselines_cross/summary.csv

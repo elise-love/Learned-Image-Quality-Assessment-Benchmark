@@ -2,7 +2,7 @@
 
 Do modern deep models fine-tuned on human quality ratings predict perceived image quality better than classical metrics, how well do they generalize across datasets, and on which distortion types do they fail?
 
-> **Status: in progress.** Main KonIQ-10k benchmark complete; cross-dataset (SPAQ, LIVE Challenge) and per-distortion (KADID-10k) analyses are next. All numbers below are measured results.
+> **Status:** main benchmark, cross-dataset generalization and per-distortion analysis complete. All numbers below are measured results.
 
 ## Motivation
 
@@ -41,11 +41,44 @@ The same baselines on the same 2,015 test images at native 1024×768 resolution 
 
 Downsampling removes fine detail that NIQE and the multi-scale MUSIQ rely on, while NIMA is essentially unaffected. MUSIQ at native resolution exceeds its published KonIQ-10k result (0.916). Its released checkpoint may have been trained on a split that differs from the official one, so it is treated here as a reference rather than a strictly comparable competitor.
 
+## Cross-dataset generalization
+
+Models trained on KonIQ-10k are scored on other datasets **without any retraining** (SRCC; our models: seed 0).
+
+| Method | KonIQ-10k test | SPAQ (smartphone) | LIVE Challenge | KADID-10k (synthetic) |
+|---|---|---|---|---|
+| **ViT-S/16 (ours)** | **0.924** | **0.872** | **0.842** | **0.571** |
+| ResNet-50 (ours, lr 1e-4) | 0.889 | 0.797 | 0.772 | 0.476 |
+| MUSIQ (KonIQ) | 0.870 | 0.869 | 0.789 | 0.556 |
+| NIMA (KonIQ) | 0.880 | 0.864 | 0.793 | 0.557 |
+| NIQE | 0.379 | 0.699 | 0.449 | 0.379 |
+| BRISQUE | 0.231 | 0.501 | 0.313 | 0.330 |
+
+![Cross-dataset SRCC](results/figures/cross_dataset_srcc.png)
+
+- ViT-S/16 remains the best method on every dataset, but its margin over the strongest baseline shrinks from +0.044 in-domain to +0.003 on SPAQ. Part of the in-domain gain reflects fitting KonIQ-10k's distribution rather than more general quality perception.
+- ResNet-50 generalizes worse than ViT-S/16 (−0.092 on SPAQ vs. −0.052).
+- Every authentic-distortion model collapses on synthetic distortions (KADID-10k, ≈0.48–0.57).
+
+## Failure modes by distortion type (KADID-10k)
+
+SRCC within each of the 25 KADID-10k distortion types (81 reference images × 5 levels each).
+
+![KADID-10k per-distortion SRCC](results/figures/kadid_per_type.png)
+
+- **Handled well:** blur (Gaussian 0.94, motion 0.91, lens 0.84), compression (JPEG2000 0.87, JPEG 0.82) and denoising artifacts (0.88), which are common in real photos.
+- **Nearly invisible to the model:** color and photometric changes. These include color shift (0.00), color block (0.07), quantization (0.12), non-eccentricity patch (0.14), mean shift (0.21), color saturation (0.23), contrast change (0.28) and darkening (0.35). MUSIQ and ResNet-50 show the same pattern.
+- The largest errors are severely color-shifted or darkened images that the model rates as acceptable. On KonIQ-10k, all eight largest errors are over-rated, and several are strongly color- or tone-manipulated photos (posterized, edge-filtered, high-contrast black and white).
+
+![Largest errors on KADID-10k](results/figures/errors_kadid10k.png)
+
+A plausible explanation, not tested here, is that ImageNet pretraining with color-jitter augmentation encourages color-invariant features, and KonIQ-10k contains few strong color distortions to counteract it.
+
 ## Key findings
 
-1. **A fine-tuned ViT-S/16 outperforms every baseline at matched resolution.** It reaches 0.926 SRCC on the KonIQ-10k test set, compared with 0.880 for the strongest baseline at the same 512×384 input (NIMA trained on KonIQ-10k). Variance across seeds is very small (±0.001).
-2. **Classical and out-of-domain metrics do not track human ratings of real photos.** BRISQUE (0.23) and NIQE (0.38) correlate weakly with MOS, and even zero-shot CLIP-IQA reaches only 0.64. Several metrics are also sensitive to input resolution: NIQE gains 0.15 SRCC and MUSIQ 0.075 at native 1024×768.
-3. **Optimization matters as much as architecture.** With backbone lr 1e-5, ResNet-50 plateaus at 0.825, close to a frozen-feature linear probe. Raising the backbone lr to 1e-4 lifts it to 0.892 (selected on validation SRCC), while ViT-S/16 already adapts well at 1e-5.
+1. **In-domain, a fine-tuned ViT-S/16 is the strongest model at matched resolution.** It reaches 0.926 ± 0.001 SRCC on KonIQ-10k, compared with 0.880 for the best baseline, while classical metrics barely track human ratings (NIQE 0.38, BRISQUE 0.23). Training details matter as much as architecture: raising ResNet-50's backbone learning rate from 1e-5 to 1e-4 lifts it from 0.825 to 0.892.
+2. **Most of the in-domain advantage does not transfer.** Zero-shot, ViT-S/16 drops by 0.05 on smartphone photos (SPAQ), by 0.08 on LIVE Challenge and to 0.57 on synthetic distortions. Its lead over KonIQ-trained baselines shrinks from +0.044 to +0.003 on SPAQ.
+3. **Learned IQA models are largely blind to color and photometric distortions.** On KADID-10k they rank blur and compression well (SRCC 0.82–0.94) but fail on color shift, color block, quantization and contrast changes (0.00–0.28). The worst errors are heavily color-shifted or darkened images rated as acceptable.
 
 ## Plan
 
@@ -66,10 +99,12 @@ Designed for a free Colab or Kaggle GPU. The quickest route is [`notebooks/01_ba
 
 ```bash
 pip install -r requirements.txt
-python scripts/download_data.py --datasets koniq10k     # via pyiqa / Hugging Face
+python scripts/download_data.py --datasets koniq10k     # add spaq livec kadid10k for phase 3
 python scripts/run_baselines.py                          # writes results/baselines/
 python -m src.train --config configs/overfit.yaml        # sanity check (64 images)
 bash scripts/train_all.sh                                # 2 backbones x 3 seeds, tables, figure
+python -m src.cross_eval --runs vit_s16_seed0 resnet50_lr1e-4_seed0   # zero-shot on SPAQ / LIVEC / KADID
+python scripts/analyze_cross.py                          # cross-dataset table, per-distortion analysis, error cases
 ```
 
 Training entry point for Colab / Kaggle: [`notebooks/02_train.ipynb`](notebooks/02_train.ipynb). Every epoch saves a resumable checkpoint, and finished runs are skipped on rerun.
@@ -80,8 +115,8 @@ Training entry point for Colab / Kaggle: [`notebooks/02_train.ipynb`](notebooks/
 
 ```
 configs/    experiment configs (YAML)
-src/        datasets.py, models.py, train.py, evaluate.py, utils.py
-scripts/    download_data.py, run_baselines.py, train_all.sh, make_tables.py, plot_scatter.py
+src/        datasets.py, models.py, train.py, evaluate.py, cross_eval.py, utils.py
+scripts/    download_data.py, run_baselines.py, train_all.sh, make_tables.py, plot_scatter.py, analyze_cross.py
 notebooks/  Colab / Kaggle entry points
 results/    per-image predictions and summary tables (committed)
 report/     technical report
@@ -91,6 +126,8 @@ report/     technical report
 
 - Pretrained MUSIQ and NIMA-KonIQ weights come from pyiqa and were trained on KonIQ-10k by their authors. They are strong in-domain references, not methods we trained ourselves.
 - KADID-10k contains synthetic distortions, while KonIQ-10k contains authentic ones, so results there measure a domain shift as well as per-distortion difficulty.
+- Cross-dataset and KADID-10k results use one seed per model; the main KonIQ-10k results use three.
+- The color-invariance explanation for the KADID-10k failures is a hypothesis; testing it (for example, pretraining without color jitter) is future work.
 - Free-tier GPUs limit model size and resolution; larger backbones are out of scope.
 
 ## Acknowledgements

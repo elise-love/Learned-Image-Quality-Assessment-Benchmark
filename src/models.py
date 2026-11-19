@@ -30,6 +30,9 @@ class IQAModel(nn.Module):
             kwargs["dynamic_img_size"] = True
         self.backbone = timm.create_model(timm_name, pretrained=pretrained,
                                           num_classes=0, **kwargs)
+        # Patch size for ViTs (None for CNNs, which accept any input size).
+        pe = getattr(self.backbone, "patch_embed", None)
+        self.patch = pe.patch_size[0] if pe is not None else None
         n_feat = self.backbone.num_features
         self.head = nn.Sequential(nn.Dropout(dropout), nn.Linear(n_feat, 1))
 
@@ -47,6 +50,11 @@ class IQAModel(nn.Module):
         nn.init.constant_(self.head[-1].bias, value)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if self.patch:                          # ViT: H and W must be multiples of 16
+            h, w = x.shape[-2:]
+            dh, dw = h % self.patch, w % self.patch
+            if dh or dw:                        # center-crop at most 15 px per side pair
+                x = x[..., dh // 2: h - (dh - dh // 2), dw // 2: w - (dw - dw // 2)]
         x = (x - self.mean) / self.std          # inputs arrive in [0, 1]
         return self.head(self.backbone(x)).squeeze(1)
 

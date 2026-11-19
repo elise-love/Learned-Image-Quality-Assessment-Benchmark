@@ -77,20 +77,44 @@ def download(name: str, data_root: str = "./datasets") -> None:
         resize_spaq(data_root)
 
 
+def _resize_one(args):
+    src_path, out_path, short_side = args
+    if os.path.exists(out_path):
+        return
+    img = Image.open(src_path)
+    # draft() lets the JPEG decoder downscale by 1/2, 1/4 or 1/8 while decoding,
+    # which is ~10x faster than decoding the full 12-MP photo first.
+    img.draft("RGB", (short_side * 2, short_side * 2))
+    img = img.convert("RGB")
+    w, h = img.size
+    s = short_side / min(w, h)
+    img.resize((round(w * s), round(h * s)), Image.BICUBIC).save(out_path, quality=95)
+
+
+def _find_image_dir(root: str) -> str:
+    """Folder under root that holds the most images (archive layouts vary)."""
+    best, n_best = root, 0
+    for d, _, files in os.walk(root):
+        n = sum(f.lower().endswith((".jpg", ".jpeg", ".png", ".bmp")) for f in files)
+        if n > n_best:
+            best, n_best = d, n
+    return best
+
+
 def resize_spaq(data_root: str, short_side: int = 512) -> None:
-    """SPAQ originals are ~4000 px; resize once so loading is not the bottleneck."""
+    """SPAQ originals are ~4000 px; resize once (in parallel) so loading is not the bottleneck."""
+    from multiprocessing import Pool
     from tqdm import tqdm
-    src = os.path.join(data_root, "SPAQ/TestImage")
     dst = os.path.join(data_root, SPECS["spaq"].image_dir)
+    src = os.path.join(data_root, "SPAQ/TestImage")
+    if not os.path.isdir(src):
+        src = _find_image_dir(os.path.join(data_root, "SPAQ"))
     os.makedirs(dst, exist_ok=True)
-    for f in tqdm(sorted(os.listdir(src)), desc="Resizing SPAQ"):
-        out = os.path.join(dst, f)
-        if os.path.exists(out):
-            continue
-        img = Image.open(os.path.join(src, f)).convert("RGB")
-        w, h = img.size
-        s = short_side / min(w, h)
-        img.resize((round(w * s), round(h * s)), Image.BICUBIC).save(out, quality=95)
+    jobs = [(os.path.join(src, f), os.path.join(dst, f), short_side) for f in sorted(os.listdir(src))
+            if f.lower().endswith((".jpg", ".jpeg", ".png"))]
+    with Pool(os.cpu_count() or 2) as pool:
+        list(tqdm(pool.imap_unordered(_resize_one, jobs, chunksize=16), total=len(jobs),
+                  desc="Resizing SPAQ"))
 
 
 # ---------------------------------------------------------------- metadata

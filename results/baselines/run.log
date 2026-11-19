@@ -1,0 +1,8 @@
+08:27:21 | koniq10k: 2015 images
+08:28:04 | niqe         SRCC 0.3792  PLCC 0.3972  (43s, lower_better=True)
+08:28:16 | brisque      SRCC 0.2314  PLCC 0.2476  (11s, lower_better=True)
+08:28:51 | nima         SRCC 0.5354  PLCC 0.6176  (25s, lower_better=False)
+08:29:20 | nima-koniq   SRCC 0.8802  PLCC 0.9110  (26s, lower_better=False)
+08:30:15 | musiq        SRCC 0.8699  PLCC 0.9019  (53s, lower_better=False)
+08:30:58 | clipiqa      SRCC 0.6421  PLCC 0.7250  (38s, lower_better=False)
+08:30:58 | Summary written to results/baselines/summary.csv

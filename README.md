@@ -2,7 +2,7 @@
 
 Do modern deep models fine-tuned on human quality ratings predict perceived image quality better than classical metrics, how well do they generalize across datasets, and on which distortion types do they fail?
 
-> **Status: in progress.** Data pipeline, baselines, evaluation and the training pipeline are implemented; cross-dataset and distortion analyses follow. Tables below are filled in only with measured results.
+> **Status: in progress.** Main KonIQ-10k benchmark complete; cross-dataset (SPAQ, LIVE Challenge) and per-distortion (KADID-10k) analyses are next. All numbers below are measured results.
 
 ## Motivation
 
@@ -10,7 +10,7 @@ In applied industry work on automatic photo quality scoring, we found that widel
 
 ## Main results
 
-KonIQ-10k official test split (2,015 images). SRCC is the primary metric. PLCC is computed after 4-parameter logistic fitting. Trained models: mean ± std over 3 seeds. All methods receive the same 512×384 input; baselines use pretrained weights from pyiqa without retraining.
+KonIQ-10k official test split (2,015 images). SRCC is the primary metric. PLCC is computed after 4-parameter logistic fitting. Trained models: mean ± std over 3 seeds unless noted. All methods receive the same 512×384 input; baselines use pretrained weights from pyiqa without retraining.
 
 | Method | Type | Trained on | SRCC | PLCC |
 |---|---|---|---|---|
@@ -20,10 +20,11 @@ KonIQ-10k official test split (2,015 images). SRCC is the primary metric. PLCC i
 | NIMA | learned | KonIQ-10k | 0.880 | 0.911 |
 | CLIP-IQA | zero-shot | none | 0.642 | 0.725 |
 | MUSIQ | learned | KonIQ-10k | 0.870 | 0.902 |
-| ResNet-50 (ours) | fine-tuned | KonIQ-10k | – | – |
-| ViT-S/16 (ours) | fine-tuned | KonIQ-10k | – | – |
+| ResNet-50 (ours), backbone lr 1e-5 | fine-tuned | KonIQ-10k | 0.825 ± 0.007 | 0.853 ± 0.004 |
+| ResNet-50 (ours), backbone lr 1e-4 | fine-tuned | KonIQ-10k | 0.892 (1 seed) | 0.911 (1 seed) |
+| **ViT-S/16 (ours)** | fine-tuned | KonIQ-10k | **0.926 ± 0.001** | **0.937 ± 0.000** |
 
-*(Figure `results/figures/scatter_koniq.png`, predicted score vs. MOS, will be added here.)*
+![Predicted score vs. MOS on the KonIQ-10k test set](results/figures/scatter_koniq.png)
 
 ### Resolution ablation (baselines)
 
@@ -42,7 +43,9 @@ Downsampling removes fine detail that NIQE and the multi-scale MUSIQ rely on, wh
 
 ## Key findings
 
-To be written from measured results.
+1. **A fine-tuned ViT-S/16 outperforms every baseline at matched resolution.** It reaches 0.926 SRCC on the KonIQ-10k test set, compared with 0.880 for the strongest baseline at the same 512×384 input (NIMA trained on KonIQ-10k). Variance across seeds is very small (±0.001).
+2. **Classical and out-of-domain metrics do not track human ratings of real photos.** BRISQUE (0.23) and NIQE (0.38) correlate weakly with MOS, and even zero-shot CLIP-IQA reaches only 0.64. Several metrics are also sensitive to input resolution: NIQE gains 0.15 SRCC and MUSIQ 0.075 at native 1024×768.
+3. **Optimization matters as much as architecture.** With backbone lr 1e-5, ResNet-50 plateaus at 0.825, close to a frozen-feature linear probe. Raising the backbone lr to 1e-4 lifts it to 0.892 (selected on validation SRCC), while ViT-S/16 already adapts well at 1e-5.
 
 ## Plan
 

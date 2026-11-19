@@ -2,4 +2,7 @@ method,dataset,seed,SRCC,PLCC,KRCC,N,best_epoch,val_SRCC,lr_backbone,source
 resnet50,koniq10k,0,0.8298,0.8552,,2015,12,0.8261,1e-05,train log (per-image predictions not saved)
 resnet50,koniq10k,1,0.8282,0.8559,,2015,14,0.8335,1e-05,train log (per-image predictions not saved)
 resnet50,koniq10k,2,0.8178,0.848,,2015,10,0.8195,1e-05,train log (per-image predictions not saved)
-vit_s16,koniq10k,0,0.9245,0.9359,,2015,14,0.9276,1e-05,train log (per-image predictions in Kaggle results zip)
+vit_s16,koniq10k,0,0.9249,0.9365,0.7648,2015,14,0.9282,1e-05,Kaggle run log (per-image predictions in results_all.zip)
+vit_s16,koniq10k,1,0.9263,0.9368,0.7675,2015,11,0.9273,1e-05,Kaggle run log (per-image predictions in results_all.zip)
+vit_s16,koniq10k,2,0.9258,0.9368,0.7666,2015,10,0.9298,1e-05,Kaggle run log (per-image predictions in results_all.zip)
+resnet50_lr1e-4,koniq10k,0,0.8917,0.9108,0.7171,2015,14,0.8964,0.0001,Kaggle run log (per-image predictions in results_all.zip)

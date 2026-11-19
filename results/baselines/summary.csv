@@ -1,0 +1,13 @@
+dataset,method,trained_on,lower_better,SRCC,PLCC,KRCC,N,limit
+koniq10k,niqe,none (natural-scene statistics),True,0.3791596682805903,0.3971903784422309,0.2574811037090945,2015,full
+koniq10k,brisque,LIVE (synthetic distortions),True,0.23136407002258902,0.24763522384843076,0.15568264673127766,2015,full
+koniq10k,nima,AVA (aesthetics),False,0.5354313199471793,0.6175696994658743,0.37644341799293646,2015,full
+koniq10k,nima-koniq,KonIQ-10k,False,0.880241371101351,0.9110154221454457,0.7033845082841772,2015,full
+koniq10k,musiq,KonIQ-10k,False,0.8698545631337066,0.9019073600456498,0.6871534932377117,2015,full
+koniq10k,clipiqa,none (zero-shot CLIP prompts),False,0.6420721302137674,0.7249959376720841,0.46187447546804106,2015,full
+koniq10k-1024,niqe,none (natural-scene statistics),True,0.5291,0.5336,,2015,full
+koniq10k-1024,brisque,LIVE (synthetic distortions),True,0.2224,0.2224,,2015,full
+koniq10k-1024,nima,AVA (aesthetics),False,0.5275,0.6121,,2015,full
+koniq10k-1024,nima-koniq,KonIQ-10k,False,0.8787,0.9094,,2015,full
+koniq10k-1024,musiq,KonIQ-10k,False,0.9445,0.9554,,2015,full
+koniq10k-1024,clipiqa,none (zero-shot CLIP prompts),False,0.6839,0.7199,,2015,full

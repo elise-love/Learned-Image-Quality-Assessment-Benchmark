@@ -138,6 +138,7 @@ def load_meta(name: str, data_root: str, phase: str | None = None) -> pd.DataFra
         "path": [os.path.join(data_root, spec.image_dir, n) for n in names],
         "mos_raw": scores.astype(float).values,
     })
+    df["path"] = _resolve_paths(df["path"], os.path.join(data_root, spec.image_dir.split("/")[0]))
     lo, hi = spec.mos_range
     df["mos"] = (df["mos_raw"] - lo) / (hi - lo)
     if spec.lower_better:
@@ -149,6 +150,25 @@ def load_meta(name: str, data_root: str, phase: str | None = None) -> pd.DataFra
         df["dist_level"] = parts.str[2].astype(int)
         df["dist_name"] = df["dist_type"].map(KADID_TYPES)
     return df
+
+
+def _resolve_paths(paths: pd.Series, search_root: str) -> pd.Series:
+    """Return paths unchanged if they exist; otherwise look the file up by name
+    (case-insensitive) anywhere under search_root. Archive layouts differ between
+    mirrors, so this avoids hard-coding one folder structure."""
+    exists = paths.map(os.path.exists)
+    if exists.all() or not os.path.isdir(search_root):
+        return paths
+    index = {}
+    for d, _, files in os.walk(search_root):
+        for f in files:
+            index.setdefault(f.lower(), os.path.join(d, f))
+    fixed = paths.where(exists, paths.map(lambda p: index.get(os.path.basename(p).lower(), p)))
+    n_missing = int((~fixed.map(os.path.exists)).sum())
+    if n_missing:
+        raise FileNotFoundError(f"{n_missing} images not found under {search_root}, "
+                                f"e.g. {fixed[~fixed.map(os.path.exists)].iloc[0]}")
+    return fixed
 
 
 def sanity_check_direction(df: pd.DataFrame) -> float:

@@ -56,16 +56,24 @@ def main():
     rows = pd.read_csv(summary_path).to_dict("records") if os.path.exists(summary_path) else []
 
     for ds_name, ds_cfg in cfg["datasets"].items():
-        ds = IQADataset(ds_name, cfg["data_root"], phase=ds_cfg.get("phase"),
-                        limit=args.limit)
+        try:
+            ds = IQADataset(ds_name, cfg["data_root"], phase=ds_cfg.get("phase"),
+                            limit=args.limit)
+        except Exception as e:
+            log.info(f"{ds_name}: FAILED to load: {type(e).__name__}: {e}")
+            continue
         loader = DataLoader(ds, batch_size=ds_cfg.get("batch_size", 1),
                             num_workers=2, shuffle=False)
         log.info(f"{ds_name}: {len(ds)} images")
 
         for m in metric_names:
-            metric = pyiqa.create_metric(m, device=device, as_loss=False)
             t0 = time.time()
-            df = score_dataset(metric, loader, device)
+            try:
+                metric = pyiqa.create_metric(m, device=device, as_loss=False)
+                df = score_dataset(metric, loader, device)
+            except Exception as e:                 # keep going with the other metrics
+                log.info(f"{m:12s} FAILED on {ds_name}: {type(e).__name__}: {e}")
+                continue
             df.to_csv(os.path.join(cfg["out_dir"], f"{ds_name}_{m}.csv"), index=False)
 
             # pyiqa tells us each metric's direction; flip lower-is-better ones.
@@ -77,6 +85,7 @@ def main():
                          "trained_on": cfg["metrics"].get(m, {}).get("trained_on", ""),
                          "lower_better": metric.lower_better, **res,
                          "limit": args.limit or "full"})
+            pd.DataFrame(rows).to_csv(summary_path, index=False)   # save after every metric
             del metric
             torch.cuda.empty_cache()
 

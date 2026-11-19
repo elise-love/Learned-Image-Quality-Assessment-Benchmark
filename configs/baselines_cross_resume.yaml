@@ -1,0 +1,11 @@
+# Resume of baselines_cross.yaml: SPAQ already finished in the first run.
+data_root: ./datasets
+out_dir: results/baselines_cross
+datasets:
+  livec:    {batch_size: 1}
+  kadid10k: {batch_size: 32}
+metrics:
+  niqe:       {trained_on: "none (natural-scene statistics)"}
+  brisque:    {trained_on: "LIVE (synthetic distortions)"}
+  nima-koniq: {trained_on: "KonIQ-10k"}
+  musiq:      {trained_on: "KonIQ-10k"}

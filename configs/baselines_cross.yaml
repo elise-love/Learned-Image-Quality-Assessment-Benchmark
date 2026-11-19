@@ -3,7 +3,7 @@ data_root: ./datasets
 out_dir: results/baselines_cross
 datasets:
   spaq:     {batch_size: 1}     # variable aspect ratio after resizing
-  livec:    {batch_size: 16}    # all 500x500
+  livec:    {batch_size: 1}     # batch 1: robust to any image-size differences
   kadid10k: {batch_size: 32}    # all 512x384
 metrics:
   niqe:       {trained_on: "none (natural-scene statistics)"}

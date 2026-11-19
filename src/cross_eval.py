@@ -26,7 +26,7 @@ from src.utils import correlation_metrics, get_logger
 TARGETS = {
     "koniq10k": {"phase": "test", "batch_size": 32},   # in-domain reference
     "spaq": {"phase": None, "batch_size": 1},
-    "livec": {"phase": None, "batch_size": 16},
+    "livec": {"phase": None, "batch_size": 1},        # batch 1: robust to any image-size differences
     "kadid10k": {"phase": None, "batch_size": 32},
 }
 
@@ -49,6 +49,7 @@ def main():
     ap.add_argument("--data-root", default="./datasets")
     ap.add_argument("--out", default="results/cross")
     ap.add_argument("--limit", type=int, help="debug: first N images per dataset")
+    ap.add_argument("--force", action="store_true", help="re-score pairs already in the summary")
     args = ap.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -61,16 +62,24 @@ def main():
         model, cfg = load_model(os.path.join(args.ckpt_dir, run, "best.pth"), device)
         method, seed = run.rsplit("_seed", 1)
         for ds_name in args.datasets:
+            if any(r["run"] == run and r["dataset"] == ds_name for r in rows) and not args.force:
+                log.info(f"{run} {ds_name}: already in summary, skipping")
+                continue
             t = TARGETS[ds_name]
-            ds = IQADataset(ds_name, args.data_root, phase=t["phase"], limit=args.limit)
-            dl = DataLoader(ds, batch_size=t["batch_size"], shuffle=False, num_workers=4,
-                            pin_memory=device.type == "cuda")
-            df = predict(model, dl, device)
+            try:
+                ds = IQADataset(ds_name, args.data_root, phase=t["phase"], limit=args.limit)
+                dl = DataLoader(ds, batch_size=t["batch_size"], shuffle=False, num_workers=4,
+                                pin_memory=device.type == "cuda")
+                df = predict(model, dl, device)
+            except Exception as e:                 # keep going with the other datasets
+                log.info(f"{run} {ds_name}: FAILED with {type(e).__name__}: {e}")
+                continue
             df.to_csv(os.path.join(args.out, f"{run}_{ds_name}.csv"), index=False)
             m = correlation_metrics(df["pred"], df["mos"])
             log.info(f"{run:24s} {ds_name:9s} SRCC {m['SRCC']:.4f}  PLCC {m['PLCC']:.4f}  N {m['N']}")
             rows = [r for r in rows if not (r["run"] == run and r["dataset"] == ds_name)]
             rows.append({"run": run, "method": method, "seed": int(seed), "dataset": ds_name, **m})
+            pd.DataFrame(rows).to_csv(summary_path, index=False)   # save after every dataset
         del model
         torch.cuda.empty_cache()
 

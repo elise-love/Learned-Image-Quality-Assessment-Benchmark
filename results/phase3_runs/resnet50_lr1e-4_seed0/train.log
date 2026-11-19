@@ -1,0 +1,17 @@
+12:18:02 | train 7058 | val 1000 | test 2015 | device cuda
+12:20:07 | ep  0 | loss 0.0971 | val SRCC 0.7662 PLCC 0.7928 | 123s
+12:22:03 | ep  1 | loss 0.0708 | val SRCC 0.8532 PLCC 0.8790 | 115s
+12:23:59 | ep  2 | loss 0.0595 | val SRCC 0.8670 PLCC 0.8909 | 116s
+12:25:55 | ep  3 | loss 0.0548 | val SRCC 0.8890 PLCC 0.9040 | 116s
+12:27:52 | ep  4 | loss 0.0500 | val SRCC 0.8856 PLCC 0.9054 | 116s
+12:29:48 | ep  5 | loss 0.0476 | val SRCC 0.8912 PLCC 0.9122 | 115s
+12:31:44 | ep  6 | loss 0.0442 | val SRCC 0.8948 PLCC 0.9140 | 116s
+12:33:40 | ep  7 | loss 0.0417 | val SRCC 0.8945 PLCC 0.9141 | 116s
+12:35:36 | ep  8 | loss 0.0391 | val SRCC 0.9004 PLCC 0.9176 | 116s
+12:37:33 | ep  9 | loss 0.0369 | val SRCC 0.8941 PLCC 0.9168 | 116s
+12:39:29 | ep 10 | loss 0.0353 | val SRCC 0.8968 PLCC 0.9169 | 116s
+12:41:25 | ep 11 | loss 0.0342 | val SRCC 0.8987 PLCC 0.9193 | 116s
+12:43:21 | ep 12 | loss 0.0333 | val SRCC 0.8986 PLCC 0.9189 | 115s
+12:45:16 | ep 13 | loss 0.0327 | val SRCC 0.8992 PLCC 0.9189 | 115s
+12:47:12 | ep 14 | loss 0.0326 | val SRCC 0.8994 PLCC 0.9194 | 115s
+12:47:25 | TEST | SRCC 0.8893 | PLCC 0.9045 | best epoch 8

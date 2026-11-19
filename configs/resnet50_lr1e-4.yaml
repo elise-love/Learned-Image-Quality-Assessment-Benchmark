@@ -1,0 +1,7 @@
+# Learning-rate diagnosis for ResNet-50. With backbone lr 1e-5 the model
+# plateaued at val SRCC ~0.82, close to what a frozen ImageNet backbone with a
+# linear head typically reaches, i.e. the backbone barely adapted.
+# The only change here is a 10x larger backbone lr. Selection uses val SRCC.
+base: configs/resnet50.yaml
+exp_name: resnet50_lr1e-4
+lr_backbone: 1.0e-4

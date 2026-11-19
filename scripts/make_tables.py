@@ -19,7 +19,8 @@ DISPLAY = {  # pyiqa / config name -> (table name, type, trained on)
     "nima-koniq": ("NIMA", "learned", "KonIQ-10k"),
     "clipiqa": ("CLIP-IQA", "zero-shot", "none"),
     "musiq": ("MUSIQ", "learned", "KonIQ-10k"),
-    "resnet50": ("ResNet-50 (ours)", "fine-tuned", "KonIQ-10k"),
+    "resnet50": ("ResNet-50 (ours, backbone lr 1e-5)", "fine-tuned", "KonIQ-10k"),
+    "resnet50_lr1e-4": ("ResNet-50 (ours, backbone lr 1e-4)", "fine-tuned", "KonIQ-10k"),
     "vit_s16": ("ViT-S/16 (ours)", "fine-tuned", "KonIQ-10k"),
 }
 

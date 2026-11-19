@@ -1,6 +1,7 @@
 # ViT-S/16 fine-tuned on KonIQ-10k. Inherits everything from resnet50.yaml
-# except the keys below. Input stays 512x384: the ViT interpolates its
-# positional embeddings (timm dynamic_img_size), giving 32x24 = 768 patches.
+# (backbone lr 1e-5, head lr 1e-3) except the keys below. Input stays 512x384:
+# the ViT interpolates its positional embeddings (timm dynamic_img_size),
+# giving 32x24 = 768 patches.
 base: configs/resnet50.yaml
 exp_name: vit_s16
 backbone: vit_s16

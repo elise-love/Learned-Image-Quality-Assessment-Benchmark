@@ -1,0 +1,5 @@
+method,dataset,seed,SRCC,PLCC,KRCC,N,best_epoch,val_SRCC,lr_backbone,source
+resnet50,koniq10k,0,0.8298,0.8552,,2015,12,0.8261,1e-05,train log (per-image predictions not saved)
+resnet50,koniq10k,1,0.8282,0.8559,,2015,14,0.8335,1e-05,train log (per-image predictions not saved)
+resnet50,koniq10k,2,0.8178,0.848,,2015,10,0.8195,1e-05,train log (per-image predictions not saved)
+vit_s16,koniq10k,0,0.9245,0.9359,,2015,14,0.9276,1e-05,train log (per-image predictions in Kaggle results zip)
